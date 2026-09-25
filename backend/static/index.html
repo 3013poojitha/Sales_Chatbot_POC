@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Chatbot</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            width: 500px;
+            height: 650px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #1f4e79;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            white-space: pre-line;
+        }
+
+        .user-message {
+            background: #dbeafe;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: #eeeeee;
+            margin-right: auto;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            gap: 10px;
+        }
+
+        #question {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #1f4e79;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #163a5c;
+        }
+        #micButton {
+    width: 50px;
+    padding: 12px;
+    background: #555;
+    font-size: 20px;
+}
+
+#micButton.listening {
+    background: #e53935;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.6);
+    }
+
+    70% {
+        transform: scale(1.08);
+        box-shadow: 0 0 0 12px rgba(229, 57, 53, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0);
+    }
+}
+.language-area {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+.language-area button {
+    padding: 8px 18px;
+    background: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.language-area button:hover {
+    background: #e0e0e0;
+}
+.language-area button.selected {
+    background: #1f4e79;
+    color: white;
+    border-color: #1f4e79;
+}
+.history-box {
+    padding: 12px 20px;
+    border-bottom: 1px solid #eee;
+    background: #fafafa;
+}
+
+.history-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #1f4e79;
+    margin-bottom: 8px;
+}
+
+#historyList {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.history-item {
+    font-size: 13px;
+    color: #555;
+    padding: 5px 8px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+
+    </style>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+    <div class="chat-header">
+        💬 Sales Chatbot
+    </div>
+
+    <div class="chat-box" id="chatBox">
+        <div class="message bot-message">
+            Hello! 👋 Ask me anything about the sales data.
+        </div>
+    </div>
+<div class="language-area">
+    <button id="englishButton" class="selected" onclick="setLanguage('en-US')">English</button>
+    <button id="arabicButton" onclick="setLanguage('ar-SA')">العربية</button>
+</div>
+
+    <div class="input-area">
+        <input
+            type="text"
+            id="question"
+            placeholder="Ask a question..."
+            onkeydown="handleKey(event)"
+        >
+
+        <button id="micButton" onclick="startVoice()">🎙</button>
+<button onclick="sendMessage()">Send</button>
+    </div>
+
+</div>
+
+<script>
+function saveChatHistory(question, answer) {
+
+    let history =
+        JSON.parse(localStorage.getItem("chatHistory")) || [];
+
+    history.push({
+        question: question,
+        answer: answer
+    });
+
+    if (history.length > 5) {
+        history = history.slice(-5);
+    }
+
+    localStorage.setItem(
+        "chatHistory",
+        JSON.stringify(history)
+    );
+}
+async function sendMessage() {
+
+    const input = document.getElementById("question");
+    const chatBox = document.getElementById("chatBox");
+
+    const question = input.value.trim();
+
+    if (!question) {
+        return;
+    }
+
+    // Show user's message
+    const userMessage = document.createElement("div");
+    userMessage.className = "message user-message";
+    userMessage.textContent = question;
+
+    chatBox.appendChild(userMessage);
+
+    input.value = "";
+
+    // Show temporary bot message
+    const loadingMessage = document.createElement("div");
+    loadingMessage.className = "message bot-message";
+    loadingMessage.textContent = "🔍 Analyzing your sales data...";
+    chatBox.appendChild(loadingMessage);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+
+        const response = await fetch("/chat/stream", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                question: question,
+                language: selectedLanguage
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("Server error: " + response.status);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        let answer = "";
+        let firstChunk = true;
+
+        while (true) {
+
+            const { value, done } = await reader.read();
+
+            if (done) {
+                break;
+            }
+
+            const chunk = decoder.decode(value, {
+                stream: true
+            });
+
+            if (firstChunk) {
+                loadingMessage.textContent = "";
+                firstChunk = false;
+            }
+
+            answer += chunk;
+
+            loadingMessage.textContent = answer;
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        saveChatHistory(question, answer);
+
+    } catch (error) {
+
+        loadingMessage.textContent =
+            "Sorry, I could not connect to the backend.";
+
+        console.error(error);
+    }
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function handleKey(event) {
+
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+
+}
+let selectedLanguage = "en-US";
+let speechLanguage = "en-US";
+let voiceInput = false;
+
+function setLanguage(language) {
+
+    selectedLanguage = language;
+
+    const englishButton =
+        document.getElementById("englishButton");
+
+    const arabicButton =
+        document.getElementById("arabicButton");
+
+    englishButton.classList.remove("selected");
+    arabicButton.classList.remove("selected");
+
+    if (language === "en-US") {
+        englishButton.classList.add("selected");
+    } else {
+        arabicButton.classList.add("selected");
+    }
+}
+function startVoice() {
+    voiceInput = true;
+
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Voice recognition is not supported. Please use Google Chrome.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    const micButton = document.getElementById("micButton");
+
+    recognition.lang = speechLanguage;
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onstart = function () {
+        micButton.classList.add("listening");
+        micButton.textContent = "🔴";
+    };
+
+    recognition.onresult = function (event) {
+
+    const transcript =
+        event.results[0][0].transcript;
+
+    document.getElementById("question").value = transcript;
+};
+
+    recognition.onend = function () {
+        micButton.classList.remove("listening");
+        micButton.textContent = "🎙";
+    };
+
+    recognition.onerror = function (event) {
+        micButton.classList.remove("listening");
+        micButton.textContent = "🎙";
+        alert("Microphone error: " + event.error);
+    };
+
+    recognition.start();
+}
+
+</script>
+
+</body>
+</html>
