@@ -19,7 +19,7 @@ def ask_gemini(prompt: str) -> str:
 
     url = (
         "https://generativelanguage.googleapis.com/"
-        "v1beta/models/gemini-2.5-flash:generateContent"
+        "v1beta/models/gemini-3.8-flash:generateContent"
         f"?key={API_KEY}"
     )
 
@@ -57,7 +57,7 @@ def stream_gemini(prompt: str):
 
     url = (
         "https://generativelanguage.googleapis.com/"
-        "v1beta/models/gemini-2.5-flash:streamGenerateContent"
+        "v1beta/models/gemini-3.8-flash:streamGenerateContent"
         f"?alt=sse&key={API_KEY}"
     )
 

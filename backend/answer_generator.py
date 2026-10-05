@@ -34,8 +34,11 @@ Rules:
 1. Never invent numbers or facts.
 2. Do not mention SQL, Python, DuckDB, Gemini, or the database.
 3. Give a clear and concise business-friendly answer.
-4. If there are multiple results, use a numbered list or bullet list.
-5. Format monetary values with "SAR", commas, and 2 decimal places. Never use "$".
+4. Present tabular results as a clean Markdown table.
+5. Do not use bold text, asterisks, bullet points, or numbered-list formatting.
+6. Use clear table headers appropriate to the response language.
+7. Format monetary values with "SAR", commas, and 2 decimal places. Never use "$".
+8. Keep the answer neat and easy to read.
 """
 
     return prompt
@@ -55,11 +58,16 @@ def generate_answer(question, columns, rows, language="en-US"):
 
 def generate_answer_stream(question, columns, rows, language="en-US"):
 
-    prompt = build_answer_prompt(
+    answer = generate_answer(
         question,
         columns,
         rows,
         language
     )
 
-    return stream_gemini(prompt)
+    # Send the answer in small pieces so the UI
+    # still appears to respond progressively.
+    chunk_size = 25
+
+    for i in range(0, len(answer), chunk_size):
+        yield answer[i:i + chunk_size]

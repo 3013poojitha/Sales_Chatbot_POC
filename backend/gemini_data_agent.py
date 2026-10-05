@@ -90,13 +90,29 @@ Rules:
 2. Never generate INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, COPY, INSTALL, LOAD, or ATTACH.
 3. Always read the data using:
    read_parquet('{DATA_PATH}')
-4. Use sales_net_value as the default sales metric unless the user asks for another sales measure.
-5. Use transaction_date for date filtering and time-based analysis.
-6. Use LOWER() when comparing text values so matching is case-insensitive.
-7. For rankings such as top products, use ORDER BY and LIMIT.
-8. For totals, use SUM().
-9. For counts, use COUNT().
-10. For averages, use AVG().
+4. Metric rules:
+   - "sales", "sales value", "revenue", or "amount" → SUM(sales_net_value)
+   - "raw sales" → SUM(sales_raw_value)
+   - "gross sales" → SUM(sales_gross_value)
+   - "sales volume" or "net volume" → SUM(sales_net_volume)
+   - "gross volume" → SUM(sales_gross_volume)
+   - "good returns" → SUM(sales_good_return_value)
+   - "good return volume" → SUM(sales_good_return_volume)
+   - "bad returns", "waste", or "wasted value" → SUM(sales_bad_return_value)
+   - "bad return volume", "wasted volume", or "waste volume" → SUM(sales_bad_return_volume)
+
+5. Never substitute one metric for another.
+6. Use transaction_date for date filtering and time-based analysis.
+7. Use LOWER() when comparing text values so matching is case-insensitive.
+8. For rankings:
+   - top products → GROUP BY product_name
+   - top customers → GROUP BY customer_name
+   - top routes → GROUP BY route_name
+   - top distribution centers → GROUP BY dc_name
+   - top categories → GROUP BY the requested category field
+   Always ORDER BY the requested metric DESC and use LIMIT when requested.
+9. For totals, use SUM() of the requested metric.
+10. For counts, use COUNT().
 11. Return only the SQL query.
 12. Do not use markdown code fences.
 

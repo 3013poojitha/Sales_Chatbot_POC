@@ -640,12 +640,14 @@ def chat(request: ChatRequest):
 @app.post("/chat/stream")
 def chat_stream(request: ChatRequest):
 
+    print("LANGUAGE RECEIVED:", request.language)
+
     def generate():
 
         try:
-            yield "🔍 Understanding your question...\n\n"
+            
             sql = generate_sql(request.question)
-            yield "📊 Checking your sales data...\n\n"
+            
 
             print("\nSTREAM SQL:")
             print(sql)
@@ -655,7 +657,7 @@ def chat_stream(request: ChatRequest):
             print("\nSTREAM RESULT:")
             print(columns)
             print(rows[:10])
-            yield "✍️ Preparing your answer...\n\n"
+            
 
             for chunk in generate_answer_stream(
                 request.question,

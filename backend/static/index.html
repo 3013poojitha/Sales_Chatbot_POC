@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -167,8 +167,29 @@
     border-radius: 5px;
     border: 1px solid #eee;
 }
+.bot-message table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+}
 
+.bot-message th,
+.bot-message td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.bot-message th {
+    font-weight: bold;
+}
+
+.bot-message tr:nth-child(even) {
+    background: #f7f7f7;
+}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
@@ -246,7 +267,10 @@ async function sendMessage() {
     // Show temporary bot message
     const loadingMessage = document.createElement("div");
     loadingMessage.className = "message bot-message";
-    loadingMessage.textContent = "🔍 Analyzing your sales data...";
+    loadingMessage.textContent =
+    selectedLanguage === "ar-SA"
+        ? "جاري التفكير..."
+        : "Thinking...";
     chatBox.appendChild(loadingMessage);
 
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -293,7 +317,7 @@ async function sendMessage() {
 
             answer += chunk;
 
-            loadingMessage.textContent = answer;
+            loadingMessage.innerHTML = marked.parse(answer);
 
             chatBox.scrollTop = chatBox.scrollHeight;
         }
