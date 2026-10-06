@@ -8,7 +8,14 @@ load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not API_KEY:
-    raise RuntimeError("GEMINI_API_KEY not found in .env")
+    try:
+        import streamlit as st
+        API_KEY = st.secrets.get("GEMINI_API_KEY")
+    except Exception:
+        API_KEY = None
+
+if not API_KEY:
+    raise RuntimeError("GEMINI_API_KEY not found")
 
 
 def ask_gemini(prompt: str) -> str:
