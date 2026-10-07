@@ -128,6 +128,32 @@ if audio_value:
             st.write("**You said:**")
             st.write(transcribed_text)
 
+            # Send the transcribed question to the chatbot
+            if transcribed_text.strip():
+
+                st.session_state.messages.append(
+                    {
+                        "role": "user",
+                        "content": transcribed_text
+                    }
+                )
+
+                with st.spinner("Getting your answer..."):
+
+                    answer = answer_question(
+                        transcribed_text,
+                        language_code
+                    )
+
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": answer
+                    }
+                )
+
+                st.rerun()
+
         except Exception as e:
 
             st.error(
