@@ -12,7 +12,7 @@ from answer_generator import generate_answer, generate_answer_stream
 
 app = FastAPI(title="Sales Chatbot POC")
 
-DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "sales_riyadh.parquet"
+DATA_PATH = Path("/tmp/sales_riyadh.parquet")
 
 
 class ChatRequest(BaseModel):

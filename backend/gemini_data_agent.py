@@ -1,4 +1,6 @@
 import json
+import os
+import gdown
 from gemini_client import ask_gemini
 
 
@@ -63,7 +65,18 @@ Other:
 - weight_kg
 """
 
-DATA_PATH = r"C:\Users\pooji\Downloads\Sales_Chatbot_POC\data\sales_riyadh.parquet"
+DATA_PATH = "/tmp/sales_riyadh.parquet"
+
+GOOGLE_DRIVE_FILE_ID = "1XAoEioXbXXeWbbbNrGDsAMpJCxswBuzI"
+
+if not os.path.exists(DATA_PATH):
+    print("Downloading sales data from Google Drive...")
+    gdown.download(
+        f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}",
+        DATA_PATH,
+        quiet=False
+    )
+    print("Sales data download completed.")
 
 
 def generate_sql(question: str) -> str:
