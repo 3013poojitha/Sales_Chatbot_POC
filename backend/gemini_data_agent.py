@@ -65,7 +65,9 @@ Other:
 - weight_kg
 """
 
-DATA_PATH = "/tmp/sales_riyadh.parquet"
+DATA_PATH = "/tmp/sales_riyadh.parquet" if os.name != "nt" else str(
+    __import__("pathlib").Path(__file__).resolve().parent.parent / "data" / "sales_riyadh.parquet"
+)
 
 GOOGLE_DRIVE_FILE_ID = "1XAoEioXbXXeWbbbNrGDsAMpJCxswBuzI"
 

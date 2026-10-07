@@ -78,6 +78,28 @@ def build_where(plan, include_dimension=True):
 
 
 def answer_question(question, language):
+        # Handle greetings before analyzing the sales data
+    q = question.strip().lower().strip("!?.,")
+    
+    greetings = {
+    "hi",
+    "hello",
+    "hey",
+    "hii",
+    "hiii",
+    "good morning",
+    "good afternoon",
+    "good evening",
+    "مرحبا",
+    "مرحبًا",
+    "السلام عليكم",
+    "السلام علیکم"
+}
+
+    if q in greetings:
+        if language == "ar-SA":
+            return "مرحبًا! كيف يمكنني مساعدتك في بيانات المبيعات؟"
+        return "Hello! How can I help you with the sales data?"
 
     # =====================================================
     # GEMINI DATA AGENT
