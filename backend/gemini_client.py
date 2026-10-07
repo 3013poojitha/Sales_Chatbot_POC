@@ -2,6 +2,8 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
 load_dotenv()
 
@@ -119,3 +121,33 @@ def stream_gemini(prompt: str):
 
                 except json.JSONDecodeError:
                     continue
+
+
+def transcribe_audio(audio_bytes: bytes) -> str:
+    """
+    Convert recorded speech audio into text using Gemini.
+    """
+
+    client = genai.Client(api_key=API_KEY)
+
+    response = client.models.generate_content(
+        model="gemini-3.8-flash",
+        contents=[
+            types.Part.from_bytes(
+                data=audio_bytes,
+                mime_type="audio/wav"
+            ),
+            """
+            Transcribe the speech in this audio.
+
+            Important:
+            - Detect whether the speaker is using English or Arabic.
+            - Return ONLY the spoken words as text.
+            - Do not translate the speech.
+            - Do not add explanations.
+            - Do not answer the question.
+            """
+        ]
+    )
+
+    return response.text.strip()

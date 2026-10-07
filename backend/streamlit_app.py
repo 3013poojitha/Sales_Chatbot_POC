@@ -1,5 +1,6 @@
 import streamlit as st
 from main import answer_question
+from gemini_client import transcribe_audio
 
 
 # =========================================================
@@ -105,3 +106,32 @@ if question:
             "content": answer
         }
     )
+    st.write("### 🎤 Voice Input")
+
+audio_value = st.audio_input(
+    "Record your question"
+)
+
+if audio_value:
+
+    with st.spinner("Transcribing your voice..."):
+
+        try:
+            audio_bytes = audio_value.getvalue()
+
+            transcribed_text = transcribe_audio(
+                audio_bytes
+            )
+
+            st.success("Voice transcribed successfully!")
+
+            st.write("**You said:**")
+            st.write(transcribed_text)
+
+        except Exception as e:
+
+            st.error(
+                "Sorry, I could not understand the audio."
+            )
+
+            print("VOICE ERROR:", e)
