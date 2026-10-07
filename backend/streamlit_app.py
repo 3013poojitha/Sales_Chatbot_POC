@@ -120,7 +120,8 @@ if audio_value:
             audio_bytes = audio_value.getvalue()
 
             transcribed_text = transcribe_audio(
-                audio_bytes
+                audio_bytes,
+                audio_value.type
             )
 
             st.success("Voice transcribed successfully!")

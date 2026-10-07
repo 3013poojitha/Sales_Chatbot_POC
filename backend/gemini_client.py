@@ -123,7 +123,7 @@ def stream_gemini(prompt: str):
                     continue
 
 
-def transcribe_audio(audio_bytes: bytes) -> str:
+def transcribe_audio(audio_bytes: bytes, mime_type: str = "audio/wav") -> str:
     """
     Convert recorded speech audio into text using Gemini.
     """
@@ -135,7 +135,7 @@ def transcribe_audio(audio_bytes: bytes) -> str:
         contents=[
             types.Part.from_bytes(
                 data=audio_bytes,
-                mime_type="audio/wav"
+                mime_type=mime_type
             ),
             """
             Transcribe the speech in this audio.
